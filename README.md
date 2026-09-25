@@ -29,6 +29,29 @@ Alunos e colaboradores do Instituto Benjamin Constant (IBC).
 - database/
 - docs/
 
+## Tecnologias
+
+### Front-end
+- React
+- Vite
+- JavaScript
+- CSS
+
+### Back-end
+- Node.js
+- Express
+- Prisma
+
+### Banco de Dados
+- PostgreSQL
+
+### DevOps e ferramentas
+- Docker
+- Docker Compose
+- Git
+- GitHub
+- Trello
+
 ## Documentação
 
 A documentação do projeto está disponível na pasta `docs/`.
