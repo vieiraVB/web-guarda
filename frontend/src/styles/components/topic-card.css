@@ -1,0 +1,51 @@
+.topic-card {
+  background: var(--background);
+
+  border: 1px solid var(--border);
+
+  border-radius: var(--radius-md);
+
+  padding: 28px;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.topic-card:hover {
+  transform: translateY(-4px);
+
+  box-shadow: var(--shadow-md);
+}
+
+.topic-card-icon {
+  width: 48px;
+  height: 48px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: var(--accent-light);
+
+  border-radius: var(--radius-sm);
+
+  font-size: 23px;
+
+  margin-bottom: 20px;
+}
+
+.topic-card h3 {
+  color: var(--primary);
+
+  font-size: 19px;
+
+  margin-bottom: 10px;
+}
+
+.topic-card p {
+  color: var(--text-secondary);
+
+  font-size: 15px;
+  line-height: 1.6;
+}

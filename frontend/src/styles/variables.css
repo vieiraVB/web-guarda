@@ -1,0 +1,53 @@
+:root {
+  /* Cores principais */
+
+  --primary: #123b5d;
+
+  --primary-dark: #0b2942;
+
+  --primary-light: #eaf3f8;
+
+  --accent: #2f80ed;
+
+  --accent-light: #eaf3ff;
+
+  /* Cores de apoio */
+
+  --success: #27ae60;
+
+  --warning: #f2c94c;
+
+  --danger: #eb5757;
+
+  /* Interface */
+
+  --background: #f8fafc;
+
+  --surface: #ffffff;
+
+  --border: #dbe3ea;
+
+  /* Texto */
+
+  --text: #1f2933;
+
+  --text-secondary: #5f6b76;
+
+  --text-light: #ffffff;
+
+  /* Elementos visuais */
+
+  --shadow-sm: 0 2px 8px rgba(18, 59, 93, 0.08);
+
+  --shadow-md: 0 8px 24px rgba(18, 59, 93, 0.12);
+
+  /* Layout */
+
+  --radius-sm: 8px;
+
+  --radius-md: 12px;
+
+  --radius-lg: 20px;
+
+  --container-width: 1200px;
+}

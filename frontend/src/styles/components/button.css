@@ -1,0 +1,54 @@
+.button {
+  border: none;
+  border-radius: var(--radius-sm);
+
+  padding: 14px 24px;
+
+  font-size: 15px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.button:hover {
+  transform: translateY(-2px);
+}
+
+.button-primary {
+  background: var(--accent);
+  color: var(--text-light);
+
+  box-shadow: var(--shadow-sm);
+}
+
+.button-primary:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.button-secondary {
+  background: var(--surface);
+  color: var(--primary);
+
+  border: 1px solid var(--border);
+}
+
+.button-secondary:hover {
+  background: var(--primary-light);
+}
+
+.button-light {
+  background: var(--surface);
+  color: var(--primary);
+}
+
+.button-outline {
+  background: transparent;
+  color: var(--primary);
+
+  border: 1px solid var(--border);
+}

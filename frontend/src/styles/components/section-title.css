@@ -1,0 +1,36 @@
+.section-title {
+  max-width: 720px;
+
+  margin-bottom: 50px;
+}
+
+.section-title-label {
+  color: var(--accent);
+
+  font-size: 13px;
+  font-weight: 800;
+
+  letter-spacing: 1.5px;
+}
+
+.section-title h2 {
+  color: var(--primary);
+
+  font-size: 38px;
+  line-height: 1.15;
+
+  margin: 12px 0 18px;
+}
+
+.section-title p {
+  color: var(--text-secondary);
+
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+@media (max-width: 600px) {
+  .section-title h2 {
+    font-size: 32px;
+  }
+}
