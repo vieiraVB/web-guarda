@@ -1,51 +1,34 @@
-import '../styles/components/navbar.css'
+import "../styles/components/navbar.css";
 
-import Button from './Button'
+import { Link } from "react-router-dom";
 
-import webGuardaIcon from '../assets/web-guarda-icon.png'
+import Button from "./Button";
+import Logo from "./Logo";
 
 function Navbar() {
   return (
     <header className="navbar">
       <div className="container navbar-content">
-        <a
-          href="#inicio"
-          className="navbar-logo"
-        >
-          <span className="navbar-logo-icon">
-            <img
-              src={webGuardaIcon}
-              alt="Web Guarda"
-            />
-          </span>
-
-          <span>Web Guarda</span>
-        </a>
+        <Link to="/" className="navbar-logo">
+          <Logo />
+        </Link>
 
         <nav className="navbar-links">
-          <a href="#inicio">
-            Início
-          </a>
+          <a href="#inicio">Início</a>
 
-          <a href="#sobre">
-            Sobre
-          </a>
+          <a href="#sobre">Sobre</a>
 
-          <a href="#conteudos">
-            Conteúdos
-          </a>
+          <Link to="/conteudos">Conteúdos</Link>
 
-          <a href="#avaliacao">
-            Avaliação
-          </a>
+          <Link to="/avaliacao-inicial">Avaliação</Link>
         </nav>
 
-        <Button variant="outline">
-          Entrar
-        </Button>
+        <Link to="/login">
+          <Button variant="outline">Entrar</Button>
+        </Link>
       </div>
     </header>
-  )
+  );
 }
 
-export default Navbar
+export default Navbar;
