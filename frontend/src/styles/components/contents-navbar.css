@@ -1,0 +1,136 @@
+.contents-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.contents-navbar-content {
+  min-height: 76px;
+
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+
+  align-items: center;
+  gap: 30px;
+}
+
+/* VOLTAR */
+
+.contents-navbar-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  width: fit-content;
+
+  color: var(--text-secondary);
+
+  font-size: 14px;
+  font-weight: 600;
+
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.contents-navbar-back:first-letter {
+  font-size: 20px;
+}
+
+.contents-navbar-back:hover {
+  color: var(--primary);
+  transform: translateX(-2px);
+}
+
+/* LOGO */
+
+.contents-navbar-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+
+  color: var(--primary);
+
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.contents-navbar-logo img {
+  width: 34px;
+  height: 34px;
+
+  object-fit: contain;
+}
+
+/* IDENTIFICAÇÃO DA ÁREA */
+
+.contents-navbar-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+
+  line-height: 1.2;
+}
+
+.contents-navbar-label {
+  color: var(--text-secondary);
+
+  font-size: 11px;
+  font-weight: 700;
+
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.contents-navbar-title {
+  color: var(--primary);
+
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* RESPONSIVIDADE */
+
+@media (max-width: 768px) {
+  .contents-navbar-content {
+    grid-template-columns: auto 1fr auto;
+
+    min-height: 68px;
+
+    gap: 16px;
+  }
+
+  .contents-navbar-back span {
+    display: none;
+  }
+
+  .contents-navbar-logo {
+    justify-content: flex-start;
+
+    font-size: 18px;
+  }
+
+  .contents-navbar-logo img {
+    width: 30px;
+    height: 30px;
+  }
+
+  .contents-navbar-section {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .contents-navbar-content {
+    grid-template-columns: auto 1fr;
+  }
+
+  .contents-navbar-logo {
+    justify-content: flex-end;
+  }
+}
