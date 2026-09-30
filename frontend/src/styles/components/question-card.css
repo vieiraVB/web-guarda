@@ -1,0 +1,161 @@
+.question-card {
+  background: var(--surface);
+
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+
+  padding: 36px;
+
+  box-shadow: var(--shadow-sm);
+}
+
+.question-card-header {
+  margin-bottom: 30px;
+}
+
+.question-number {
+  display: inline-block;
+
+  margin-bottom: 10px;
+
+  color: var(--accent);
+
+  font-size: 13px;
+  font-weight: 800;
+
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.question-card-header h2 {
+  color: var(--primary);
+
+  font-size: 24px;
+  line-height: 1.4;
+}
+
+/* ALTERNATIVAS */
+
+.question-options {
+  display: flex;
+  flex-direction: column;
+
+  gap: 12px;
+}
+
+.question-option {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+
+  gap: 14px;
+
+  padding: 16px;
+
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+
+  background: var(--surface);
+
+  color: var(--text);
+
+  text-align: left;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.question-option:hover {
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+
+.question-option.selected {
+  border-color: var(--accent);
+
+  background: var(--accent-light);
+
+  box-shadow: 0 0 0 2px rgba(47, 128, 237, 0.08);
+}
+
+.option-letter {
+  flex-shrink: 0;
+
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid var(--border);
+  border-radius: 50%;
+
+  background: var(--surface);
+
+  color: var(--primary);
+
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.question-option.selected .option-letter {
+  border-color: var(--accent);
+
+  background: var(--accent);
+
+  color: var(--text-light);
+}
+
+.option-text {
+  flex: 1;
+
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.option-radio {
+  flex-shrink: 0;
+
+  width: 24px;
+  height: 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 2px solid var(--border);
+  border-radius: 50%;
+
+  color: var(--text-light);
+
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.question-option.selected .option-radio {
+  border-color: var(--accent);
+
+  background: var(--accent);
+}
+
+@media (max-width: 600px) {
+  .question-card {
+    padding: 24px 20px;
+  }
+
+  .question-card-header h2 {
+    font-size: 20px;
+  }
+
+  .question-option {
+    padding: 13px;
+  }
+
+  .option-text {
+    font-size: 14px;
+  }
+}

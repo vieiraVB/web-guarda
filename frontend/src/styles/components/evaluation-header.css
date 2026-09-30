@@ -1,0 +1,68 @@
+.evaluation-header {
+  width: 100%;
+
+  background: var(--surface);
+
+  border-bottom: 1px solid var(--border);
+}
+
+.evaluation-header-content {
+  width: min(100% - 40px, var(--container-width));
+
+  min-height: 70px;
+
+  margin: 0 auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+}
+
+.evaluation-logo {
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+
+  color: var(--primary);
+
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.evaluation-logo img {
+  width: 34px;
+  height: 34px;
+
+  object-fit: contain;
+}
+
+.evaluation-title {
+  color: var(--text-secondary);
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+@media (max-width: 600px) {
+  .evaluation-header-content {
+    width: min(100% - 32px, var(--container-width));
+
+    min-height: 64px;
+  }
+
+  .evaluation-logo {
+    font-size: 16px;
+  }
+
+  .evaluation-logo img {
+    width: 30px;
+    height: 30px;
+  }
+
+  .evaluation-title {
+    font-size: 12px;
+  }
+}

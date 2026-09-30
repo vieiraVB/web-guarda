@@ -1,0 +1,309 @@
+.cadastro-main {
+  min-height: calc(100vh - 76px);
+  display: flex;
+  align-items: center;
+  background: var(--background);
+  padding: 80px 0;
+}
+
+.cadastro-container {
+  display: grid;
+  grid-template-columns: 1fr 480px;
+  align-items: center;
+  gap: 90px;
+}
+
+/* INTRODUÇÃO */
+
+.cadastro-intro {
+  max-width: 580px;
+}
+
+.cadastro-label {
+  display: inline-block;
+  margin-bottom: 20px;
+
+  color: var(--accent);
+
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.cadastro-intro h1 {
+  margin-bottom: 24px;
+
+  color: var(--primary);
+
+  font-size: clamp(42px, 5vw, 62px);
+  line-height: 1.05;
+  letter-spacing: -2px;
+}
+
+.cadastro-intro > p {
+  max-width: 540px;
+
+  margin-bottom: 36px;
+
+  color: var(--text-secondary);
+
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+/* BENEFÍCIOS */
+
+.cadastro-benefits {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.benefit-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.benefit-icon {
+  flex-shrink: 0;
+
+  width: 28px;
+  height: 28px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #e9f8ef;
+  color: var(--success);
+
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.benefit-item div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.benefit-item strong {
+  color: var(--primary);
+  font-size: 15px;
+}
+
+.benefit-item span {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+/* CARD */
+
+.cadastro-card {
+  background: var(--surface);
+
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+
+  padding: 36px;
+
+  box-shadow: var(--shadow-md);
+}
+
+.cadastro-card-header {
+  margin-bottom: 28px;
+}
+
+.cadastro-card-header h2 {
+  margin-bottom: 6px;
+
+  color: var(--primary);
+
+  font-size: 28px;
+  line-height: 1.2;
+}
+
+.cadastro-card-header p {
+  color: var(--text-secondary);
+  font-size: 15px;
+}
+
+/* FORMULÁRIO */
+
+.cadastro-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.form-group label {
+  color: var(--primary);
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.form-group input {
+  width: 100%;
+
+  padding: 13px 14px;
+
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+
+  background: var(--surface);
+  color: var(--text);
+
+  font-size: 15px;
+
+  outline: none;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.form-group input::placeholder {
+  color: #9aa6b2;
+}
+
+.form-group input:focus {
+  border-color: var(--accent);
+
+  box-shadow: 0 0 0 3px var(--accent-light);
+}
+
+.Cadastro-button {
+  width: 100%;
+
+  padding: 13px 20px;
+
+  border: none;
+
+  border-radius: var(--radius-sm);
+
+  background: var(--primary);
+
+  color: var(--text-light);
+
+  font-size: 15px;
+  font-weight: 700;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.Cadastro-button:hover {
+  background: var(--primary-dark);
+
+  transform: translateY(-1px);
+}
+
+.Cadastro-button:focus-visible {
+  outline: 3px solid var(--accent-light);
+
+  outline-offset: 2px;
+}
+
+/* CHECKBOX */
+
+.form-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+
+  margin: 2px 0 4px;
+}
+
+.form-checkbox input {
+  width: 16px;
+  height: 16px;
+
+  margin-top: 3px;
+
+  accent-color: var(--accent);
+}
+
+.form-checkbox label {
+  color: var(--text-secondary);
+
+  font-size: 13px;
+  line-height: 1.5;
+
+  cursor: pointer;
+}
+
+/* LOGIN */
+
+.cadastro-login {
+  margin-top: 24px;
+
+  color: var(--text-secondary);
+
+  font-size: 14px;
+  text-align: center;
+}
+
+.cadastro-login a {
+  margin-left: 5px;
+
+  color: var(--accent);
+
+  font-weight: 700;
+
+  transition: color 0.2s ease;
+}
+
+.cadastro-login a:hover {
+  color: var(--primary);
+}
+
+/* RESPONSIVIDADE */
+
+@media (max-width: 1000px) {
+  .cadastro-container {
+    grid-template-columns: 1fr;
+    gap: 50px;
+  }
+
+  .cadastro-intro {
+    max-width: 700px;
+  }
+
+  .cadastro-card {
+    width: 100%;
+    max-width: 520px;
+  }
+}
+
+@media (max-width: 600px) {
+  .cadastro-main {
+    padding: 56px 0;
+  }
+
+  .cadastro-intro h1 {
+    font-size: 42px;
+  }
+
+  .cadastro-intro > p {
+    font-size: 17px;
+  }
+
+  .cadastro-card {
+    padding: 28px 22px;
+  }
+
+  .cadastro-card-header h2 {
+    font-size: 25px;
+  }
+}
