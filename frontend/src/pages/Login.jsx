@@ -1,18 +1,29 @@
 import '../styles/pages/login.css'
 
+import { Link, useNavigate } from 'react-router-dom'
+
+import webGuardaIcon from '../assets/web-guarda-icon.png'
+
 function Login() {
+  const navigate = useNavigate()
+
+  function handleSubmit(event) {
+    event.preventDefault()
+    navigate('/avaliacao-inicial')
+  }
+
   return (
     <main className="login-page">
       <div className="login-container">
         <section className="login-brand">
-          <a href="/" className="login-logo">
+          <Link to="/" className="login-logo">
             <img
-              src="../src/assets/web-guarda-icon.png"
+              src={webGuardaIcon}
               alt="Web Guarda"
             />
 
             <span>Web Guarda</span>
-          </a>
+          </Link>
 
           <div className="login-intro">
             <span className="login-label">
@@ -58,7 +69,7 @@ function Login() {
             </p>
           </div>
 
-          <form className="login-form">
+          <form className="login-form" onSubmit={handleSubmit}>
             <div className="form-group">
               <label htmlFor="email">
                 E-mail
@@ -103,9 +114,9 @@ function Login() {
           <p className="login-register">
             Ainda não possui uma conta?
 
-            <a href="/cadastro">
+            <Link to="/cadastro">
               Criar minha conta
-            </a>
+            </Link>
           </p>
         </section>
       </div>

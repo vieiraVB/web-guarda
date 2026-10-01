@@ -1,17 +1,21 @@
 import '../styles/components/evaluation-header.css'
 
+import { Link } from 'react-router-dom'
+
+import webGuardaIcon from '../assets/web-guarda-icon.png'
+
 function EvaluationHeader({ title }) {
   return (
     <header className="evaluation-header">
       <div className="evaluation-header-content">
-        <a href="/" className="evaluation-logo">
+        <Link to="/" className="evaluation-logo">
           <img
-            src="../src/assets/web-guarda-icon.png"
+            src={webGuardaIcon}
             alt="Web Guarda"
           />
 
           <span>Web Guarda</span>
-        </a>
+        </Link>
 
         <span className="evaluation-title">
           {title}

@@ -1,5 +1,7 @@
 import '../styles/pages/conteudos.css'
 
+import { useNavigate } from 'react-router-dom'
+
 import Footer from '../components/Footer'
 import Button from '../components/Button'
 
@@ -7,6 +9,8 @@ import webGuardaIcon from '../assets/web-guarda-icon.png'
 import ContentsNavbar from '../components/ContentsNavbar'
 
 function Conteudos() {
+  const navigate = useNavigate()
+
   const topics = [
     {
       number: '01',
@@ -398,8 +402,8 @@ function Conteudos() {
                 </p>
               </div>
 
-              <Button>
-                Fazer avaliação
+              <Button onClick={() => navigate('/avaliacao-final')}>
+                Fazer avaliação final
               </Button>
             </div>
           </div>

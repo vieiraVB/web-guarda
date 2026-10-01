@@ -410,8 +410,13 @@
   margin-bottom: 10px;
 }
 
+.topic-heading > div {
+  min-width: 0;
+}
+
 .topic-tag {
   display: inline-block;
+  width: fit-content;
 
   color: var(--accent);
 
@@ -428,6 +433,8 @@
   letter-spacing: 0.3px;
 
   margin-bottom: 7px;
+
+  white-space: nowrap;
 }
 
 .content-topic-card h3 {
@@ -448,6 +455,8 @@
   font-weight: 600;
 
   padding-top: 4px;
+
+  white-space: nowrap;
 }
 
 .content-topic-card p {

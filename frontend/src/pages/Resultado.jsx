@@ -5,20 +5,43 @@ import '../styles/pages/resultado.css'
 import EvaluationHeader from '../components/EvaluationHeader'
 import Button from '../components/Button'
 
+function readStoredResult(key) {
+  try {
+    const storedResult = localStorage.getItem(key)
+
+    return storedResult ? JSON.parse(storedResult) : null
+  } catch {
+    return null
+  }
+}
+
 function Resultado() {
   const location = useLocation()
   const navigate = useNavigate()
 
-  const result = location.state || {
-    correct: 0,
-    total: 5,
-    percentage: 0,
-  }
+  const initialResult = readStoredResult('webGuardaResultadoInicial')
+  const finalResult = readStoredResult('webGuardaResultadoFinal')
 
+  const result =
+    location.state ||
+    finalResult ||
+    initialResult || {
+      phase: 'initial',
+      correct: 0,
+      total: 10,
+      percentage: 0,
+    }
+
+  const isFinalResult = result.phase === 'final'
   const { correct, total, percentage } = result
+  const errors = total - correct
+  const difference =
+    isFinalResult && initialResult
+      ? percentage - initialResult.percentage
+      : null
 
-  function handleContents() {
-    navigate('/conteudos')
+  function handleNextStep() {
+    navigate(isFinalResult ? '/feedback' : '/conteudos')
   }
 
   return (
@@ -29,7 +52,7 @@ function Resultado() {
         <div className="container resultado-container">
           <section className="resultado-header">
             <span className="resultado-label">
-              AVALIAÇÃO CONCLUÍDA
+              AVALIACAO CONCLUIDA
             </span>
 
             <h1>
@@ -37,9 +60,9 @@ function Resultado() {
             </h1>
 
             <p>
-              Este resultado representa seu conhecimento
-              inicial sobre segurança digital. Continue
-              aprendendo para fortalecer sua proteção.
+              {isFinalResult
+                ? 'Este é o resultado da avaliação final. A comparação abaixo apenas mostra os valores registrados nas duas etapas.'
+                : 'Este é o resultado da avaliação inicial. Use-o como ponto de partida antes de acessar os conteúdos educativos.'}
             </p>
           </section>
 
@@ -66,7 +89,7 @@ function Resultado() {
               </div>
 
               <div className="resultado-stat">
-                <strong>{total - correct}</strong>
+                <strong>{errors}</strong>
 
                 <span>
                   respostas incorretas
@@ -83,28 +106,60 @@ function Resultado() {
             </div>
           </section>
 
+          {isFinalResult && (
+            <section className="resultado-comparison">
+              <div>
+                <span>Avaliação inicial</span>
+                <strong>
+                  {initialResult ? `${initialResult.percentage}%` : 'Nao registrada'}
+                </strong>
+              </div>
+
+              <div>
+                <span>Avaliação final</span>
+                <strong>{percentage}%</strong>
+              </div>
+
+              <div className="comparison-difference">
+                <span>Diferenca</span>
+                <strong>
+                  {difference === null
+                    ? 'Não disponível'
+                    : `${difference > 0 ? '+' : ''}${difference} pontos percentuais`}
+                </strong>
+              </div>
+
+              <p>
+                A diferenca acima apresenta apenas os valores registrados nas
+                avaliações. Ela não deve ser interpretada como prova de
+                eficácia ou causalidade.
+              </p>
+            </section>
+          )}
+
           <section className="resultado-message">
             <div className="resultado-message-icon">
-              ✓
+              OK
             </div>
 
             <div>
               <h2>
-                Agora é hora de aprender.
+                {isFinalResult
+                  ? 'Obrigado por concluir a trilha.'
+                  : 'Agora é hora de aprender.'}
               </h2>
 
               <p>
-                Explore os conteúdos do Web Guarda e
-                conheça formas de identificar ameaças,
-                proteger seus dados e navegar com mais
-                segurança.
+                {isFinalResult
+                  ? 'Compartilhe sua experiência para ajudar a melhorar a apresentação e a plataforma Web Guarda.'
+                  : 'Explore os conteúdos do Web Guarda e conheça formas de identificar ameaças, proteger seus dados e navegar com mais segurança.'}
               </p>
             </div>
           </section>
 
           <div className="resultado-actions">
-            <Button onClick={handleContents}>
-              Conhecer os conteúdos
+            <Button onClick={handleNextStep}>
+              {isFinalResult ? 'Enviar feedback' : 'Conhecer os conteúdos'}
             </Button>
           </div>
         </div>

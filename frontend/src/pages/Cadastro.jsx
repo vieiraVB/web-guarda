@@ -1,6 +1,15 @@
 import '../styles/pages/cadastro.css'
 
+import { Link, useNavigate } from 'react-router-dom'
+
 function Cadastro() {
+  const navigate = useNavigate()
+
+  function handleSubmit(event) {
+    event.preventDefault()
+    navigate('/avaliacao-inicial')
+  }
+
   return (
     <div className="cadastro-page">
 
@@ -68,7 +77,7 @@ function Cadastro() {
               </p>
             </div>
 
-            <form className="cadastro-form">
+            <form className="cadastro-form" onSubmit={handleSubmit}>
               <div className="form-group">
                 <label htmlFor="nome">
                   Nome completo
@@ -140,9 +149,9 @@ function Cadastro() {
 
             <p className="cadastro-login">
               Já possui uma conta?
-              <a href="/login">
+              <Link to="/login">
                 Entrar
-              </a>
+              </Link>
             </p>
           </section>
         </div>

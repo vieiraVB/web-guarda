@@ -19,6 +19,18 @@
   transform: translateY(-2px);
 }
 
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
+  box-shadow: none;
+}
+
+.button:focus-visible {
+  outline: 3px solid var(--accent-light);
+  outline-offset: 2px;
+}
+
 .button-primary {
   background: var(--accent);
   color: var(--text-light);
@@ -51,4 +63,9 @@
   color: var(--primary);
 
   border: 1px solid var(--border);
+}
+
+.button:disabled:hover {
+  transform: none;
+  box-shadow: none;
 }

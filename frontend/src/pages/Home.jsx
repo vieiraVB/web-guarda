@@ -1,5 +1,7 @@
 import '../styles/pages/home.css'
 
+import { useNavigate } from 'react-router-dom'
+
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import Button from '../components/Button'
@@ -9,6 +11,8 @@ import TopicCard from '../components/TopicCard'
 import webGuardaIcon from '../assets/web-guarda-icon.png'
 
 function Home() {
+  const navigate = useNavigate()
+
   return (
     <div className="home">
       <Navbar />
@@ -206,7 +210,7 @@ function Home() {
                 sobre segurança digital.
               </p>
 
-              <Button>
+              <Button onClick={() => navigate('/avaliacao-inicial')}>
                 Fazer avaliação
               </Button>
             </div>
