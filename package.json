@@ -1,4 +1,13 @@
 {
+  "name": "web-guarda",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "setup": "npm run setup:docker && npm run setup:backend",
+    "setup:docker": "docker compose up -d",
+    "setup:backend": "npm --prefix backend install && npm --prefix backend run setup",
+    "dev": "npm --prefix backend run dev"
+  },
   "dependencies": {
     "react-router-dom": "^7.18.4"
   }
