@@ -12,6 +12,15 @@ dist
 dist-ssr
 *.local
 
+# Prisma AI agent skills
+backend/.agents/
+backend/.claude/
+backend/.cursor/
+backend/.devin/
+
+# Prisma
+backend/generated/
+
 # Editor directories and files
 .env
 .vscode/*

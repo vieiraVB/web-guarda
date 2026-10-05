@@ -1,7 +1,145 @@
 generator client {
   provider = "prisma-client"
+  output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+model Usuario {
+  id                 BigInt   @id @default(autoincrement())
+  codigoParticipante String   @unique @db.Uuid
+  nome               String
+  email              String   @unique
+  senhaHash          String
+  perfil             String
+  criadoEm           DateTime @default(now())
+
+  acessosConteudo AcessoConteudo[]
+  tentativas      Tentativa[]
+  conclusoes      ConclusaoModulo[]
+}
+
+model Conteudo {
+  id        BigInt   @id @default(autoincrement())
+  titulo    String
+  tema      String
+  corpo     String
+  ordem     Int
+  publicado Boolean  @default(false)
+  criadoEm  DateTime @default(now())
+
+  acessos AcessoConteudo[]
+}
+
+model AcessoConteudo {
+  usuarioId   BigInt
+  conteudoId  BigInt
+  acessadoEm  DateTime  @default(now())
+  concluidoEm DateTime?
+
+  usuario  Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  conteudo Conteudo @relation(fields: [conteudoId], references: [id], onDelete: Cascade)
+
+  @@id([usuarioId, conteudoId])
+  @@index([conteudoId])
+}
+
+model ConclusaoModulo {
+  id          BigInt   @id @default(autoincrement())
+  usuarioId   BigInt
+  concluidoEm DateTime
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId])
+}
+
+model Questionario {
+  id              BigInt  @id @default(autoincrement())
+  grupoComparacao String
+  fase            String
+  versao          String
+  titulo          String
+  ativo           Boolean @default(true)
+
+  questoes   QuestionarioQuestao[]
+  tentativas Tentativa[]
+  respostas  Resposta[]
+}
+
+model Questao {
+  id        BigInt  @id @default(autoincrement())
+  enunciado String
+  tema      String
+  ativa     Boolean @default(true)
+
+  questionarios QuestionarioQuestao[]
+  alternativas  Alternativa[]
+  respostas     Resposta[]
+}
+
+model QuestionarioQuestao {
+  questionarioId BigInt
+  questaoId      BigInt
+  ordem          Int
+  peso           Decimal
+
+  questionario Questionario @relation(fields: [questionarioId], references: [id], onDelete: Cascade)
+  questao      Questao      @relation(fields: [questaoId], references: [id], onDelete: Cascade)
+
+  @@id([questionarioId, questaoId])
+  @@index([questaoId])
+}
+
+model Alternativa {
+  id        BigInt  @id @default(autoincrement())
+  questaoId BigInt
+  texto     String
+  correta   Boolean @default(false)
+
+  questao   Questao    @relation(fields: [questaoId], references: [id], onDelete: Cascade)
+  respostas Resposta[]
+
+  @@index([questaoId])
+}
+
+model Tentativa {
+  id                  BigInt   @id @default(autoincrement())
+  usuarioId           BigInt
+  questionarioId      BigInt
+  status              String
+  pontuacaoPercentual Decimal?
+
+  usuario      Usuario      @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  questionario Questionario @relation(fields: [questionarioId], references: [id], onDelete: Cascade)
+  respostas    Resposta[]
+
+  @@index([usuarioId])
+  @@index([questionarioId])
+}
+
+model Resposta {
+  id             BigInt @id @default(autoincrement())
+  tentativaId    BigInt
+  questionarioId BigInt
+  questaoId      BigInt
+  alternativaId  BigInt
+
+  tentativa    Tentativa    @relation(fields: [tentativaId], references: [id], onDelete: Cascade)
+  questionario Questionario @relation(fields: [questionarioId], references: [id], onDelete: Cascade)
+  questao      Questao      @relation(fields: [questaoId], references: [id], onDelete: Cascade)
+  alternativa  Alternativa  @relation(fields: [alternativaId], references: [id], onDelete: Cascade)
+
+  @@index([tentativaId])
+  @@index([questionarioId])
+  @@index([questaoId])
+  @@index([alternativaId])
+}
+
+model Feedback {
+  id         BigInt   @id @default(autoincrement())
+  comentario String
+  criadoEm   DateTime @default(now())
 }

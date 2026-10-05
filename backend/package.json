@@ -1,12 +1,14 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Backend da plataforma Web Guarda",
+  "main": "src/app.js",
   "scripts": {
     "dev": "nodemon src/app.js",
     "start": "node src/app.js",
-    "postinstall": "prisma skills sync || exit 0"
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate deploy",
+    "db:setup": "prisma migrate deploy && prisma generate"
   },
   "keywords": [],
   "author": "",
