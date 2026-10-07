@@ -9,6 +9,7 @@
     "dev": "npm --prefix backend run dev"
   },
   "dependencies": {
+    "jsonwebtoken": "^9.0.3",
     "react-router-dom": "^7.18.4"
   }
 }

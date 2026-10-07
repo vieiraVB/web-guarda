@@ -127,10 +127,15 @@
 
 @media (max-width: 480px) {
   .contents-navbar-content {
-    grid-template-columns: auto 1fr;
+    grid-template-columns: auto minmax(0, 1fr);
   }
 
   .contents-navbar-logo {
     justify-content: flex-end;
+  }
+
+  .contents-navbar-logo .logo {
+    gap: 6px;
+    font-size: 16px;
   }
 }

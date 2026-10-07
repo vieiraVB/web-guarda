@@ -1,98 +1,76 @@
 import '../styles/pages/conteudos.css'
 
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import Footer from '../components/Footer'
-import Button from '../components/Button'
+import ContentsNavbar from '../components/ContentsNavbar'
 
 import webGuardaIcon from '../assets/web-guarda-icon.png'
-import ContentsNavbar from '../components/ContentsNavbar'
+
+const API_URL = 'http://localhost:3000/api'
 
 function Conteudos() {
   const navigate = useNavigate()
 
-  const topics = [
-    {
-      number: '01',
-      title: 'Phishing',
-      tag: 'Ameaças',
-      description:
-        'Aprenda a identificar mensagens, links e páginas falsas criadas para roubar informações.',
-      level: 'Iniciante',
-    },
-    {
-      number: '02',
-      title: 'Golpes virtuais',
-      tag: 'Ameaças',
-      description:
-        'Conheça os principais golpes encontrados na internet e saiba quais sinais devem chamar sua atenção.',
-      level: 'Iniciante',
-    },
-    {
-      number: '03',
-      title: 'Engenharia social',
-      tag: 'Comportamento',
-      description:
-        'Entenda como criminosos utilizam manipulação e confiança para conseguir informações.',
-      level: 'Intermediário',
-    },
-    {
-      number: '04',
-      title: 'Senhas seguras',
-      tag: 'Proteção',
-      description:
-        'Descubra como criar senhas mais fortes e proteger suas contas contra acessos indevidos.',
-      level: 'Iniciante',
-    },
-    {
-      number: '05',
-      title: 'Roubo de dados',
-      tag: 'Privacidade',
-      description:
-        'Entenda como seus dados podem ser expostos e quais cuidados ajudam a reduzir esses riscos.',
-      level: 'Intermediário',
-    },
-    {
-      number: '06',
-      title: 'Páginas falsas',
-      tag: 'Ameaças',
-      description:
-        'Aprenda a observar sinais que ajudam a diferenciar sites legítimos de páginas fraudulentas.',
-      level: 'Iniciante',
-    },
-    {
-      number: '07',
-      title: 'Malware',
-      tag: 'Ameaças',
-      description:
-        'Conheça programas maliciosos, seus riscos e os principais cuidados para evitar infecções.',
-      level: 'Intermediário',
-    },
-    {
-      number: '08',
-      title: 'Proteção de contas',
-      tag: 'Proteção',
-      description:
-        'Veja práticas que ajudam a manter suas contas e informações pessoais mais protegidas.',
-      level: 'Iniciante',
-    },
-    {
-      number: '09',
-      title: 'Wi-Fi público',
-      tag: 'Privacidade',
-      description:
-        'Entenda os riscos de utilizar redes públicas e quais cuidados devem ser adotados.',
-      level: 'Intermediário',
-    },
-    {
-      number: '10',
-      title: 'Privacidade e proteção de dados',
-      tag: 'Privacidade',
-      description:
-        'Aprenda boas práticas para preservar sua privacidade durante o uso de serviços digitais.',
-      level: 'Iniciante',
-    },
-  ]
+  const [conteudos, setConteudos] = useState([])
+  const [carregando, setCarregando] = useState(true)
+  const [erro, setErro] = useState('')
+  const [avaliacaoFinal, setAvaliacaoFinal] = useState(null)
+
+  useEffect(() => {
+    async function carregarConteudos() {
+      try {
+        const token = localStorage.getItem('token')
+
+        if (!token) {
+          navigate('/login')
+          return
+        }
+
+        const [response, statusResponse] = await Promise.all([
+          fetch(`${API_URL}/conteudos`, {
+            method: 'GET',
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch(`${API_URL}/avaliacoes/status`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ])
+
+        const [data, statusData] = await Promise.all([
+          response.json(),
+          statusResponse.json(),
+        ])
+
+        if (!response.ok) {
+          throw new Error(
+            data.error || 'Não foi possível carregar os conteúdos.'
+          )
+        }
+        if (!statusResponse.ok) {
+          throw new Error(statusData.error || 'Não foi possível verificar a avaliação final.')
+        }
+
+        setConteudos(data.conteudos || [])
+        setAvaliacaoFinal(statusData.estado.avaliacaoFinal)
+      } catch (error) {
+        setErro(error.message)
+      } finally {
+        setCarregando(false)
+      }
+    }
+
+    carregarConteudos()
+  }, [navigate])
+
+  const modulosConcluidos = conteudos.filter((conteudo) =>
+    conteudo.etapas?.length > 0 &&
+    conteudo.etapas.every((etapa) => etapa.concluida === true)
+  ).length
+  const totalModulos = conteudos.length || 5
+  const avaliacaoLiberada = avaliacaoFinal?.liberada ?? modulosConcluidos >= 3
+  const avaliacaoConcluida = Boolean(avaliacaoFinal?.concluida)
 
   return (
     <div className="conteudos-page">
@@ -114,20 +92,19 @@ function Conteudos() {
               </h1>
 
               <p>
-                Explore conteúdos sobre segurança digital e descubra
-                como reconhecer ameaças, proteger seus dados e tomar
-                decisões mais seguras no ambiente digital.
+                Explore os módulos sobre segurança digital e avance
+                pelas etapas de cada conteúdo no seu próprio ritmo.
               </p>
 
               <div className="contents-hero-meta">
                 <div>
-                  <strong>10</strong>
-                  <span>temas disponíveis</span>
+                  <strong>{conteudos.length}</strong>
+                  <span>módulos disponíveis</span>
                 </div>
 
                 <div>
-                  <strong>3</strong>
-                  <span>áreas de conhecimento</span>
+                  <strong>{modulosConcluidos}</strong>
+                  <span>módulos concluídos</span>
                 </div>
               </div>
             </div>
@@ -149,19 +126,30 @@ function Conteudos() {
                 <strong>Conhecimento protege.</strong>
 
                 <p>
-                  Comece pelos conceitos básicos e avance conforme
-                  seu conhecimento aumenta.
+                  Cada módulo possui quatro etapas. Você pode
+                  escolher qualquer módulo e avançar pelas etapas
+                  em sequência.
                 </p>
               </div>
 
               <div className="overview-progress">
                 <div className="progress-label">
-                  <span>Trilha de segurança</span>
-                  <span>10 conteúdos</span>
+                  <span>Progresso geral</span>
+                  <span>
+                    {modulosConcluidos}/{conteudos.length || 5}
+                  </span>
                 </div>
 
                 <div className="progress-bar">
-                  <span />
+                  <span
+                    style={{
+                      width: `${
+                        conteudos.length > 0
+                          ? (modulosConcluidos / conteudos.length) * 100
+                          : 0
+                      }%`,
+                    }}
+                  />
                 </div>
               </div>
             </div>
@@ -192,15 +180,15 @@ function Conteudos() {
               </p>
 
               <p>
-                Os conteúdos do Web Guarda foram organizados para
-                apresentar esses conceitos de maneira simples,
-                objetiva e acessível.
+                Os conteúdos do Web Guarda foram organizados em
+                módulos independentes para que você possa escolher
+                por onde começar.
               </p>
             </div>
           </div>
         </section>
 
-        {/* TEMAS */}
+        {/* MÓDULOS */}
         <section className="topics-section">
           <div className="container">
             <div className="topics-header">
@@ -210,113 +198,109 @@ function Conteudos() {
                 </span>
 
                 <h2>
-                  Escolha um tema
+                  Escolha um módulo
                 </h2>
               </div>
 
               <p>
-                Explore os conteúdos disponíveis e conheça as
-                principais ameaças e práticas de proteção digital.
+                Cada módulo possui quatro etapas. As etapas de um
+                mesmo módulo devem ser concluídas em sequência.
               </p>
             </div>
 
-            <div className="topics-list">
-              {topics.map((topic) => (
-                <article
-                  className="content-topic-card"
-                  key={topic.number}
-                >
-                  <div className="topic-number">
-                    {topic.number}
-                  </div>
+            {carregando && (
+              <div className="contents-state">
+                <p>Carregando conteúdos...</p>
+              </div>
+            )}
 
-                  <div className="topic-main">
-                    <div className="topic-heading">
-                      <div>
-                        <span className="topic-tag">
-                          {topic.tag}
-                        </span>
+            {!carregando && erro && (
+              <div className="contents-state contents-state-error">
+                <p>{erro}</p>
+              </div>
+            )}
 
-                        <h3>{topic.title}</h3>
-                      </div>
+            {!carregando && !erro && conteudos.length === 0 && (
+              <div className="contents-state">
+                <p>Nenhum conteúdo disponível no momento.</p>
+              </div>
+            )}
 
-                      <span className="topic-level">
-                        {topic.level}
-                      </span>
+            {!carregando && !erro && conteudos.length > 0 && (
+              <div className="topics-list">
+                {conteudos.map((conteudo) => {
+                  const etapasConcluidas = conteudo.etapas?.filter(
+                    (etapa) => etapa.concluida === true,
+                  ).length || 0;
+                  const totalEtapas = conteudo.etapas?.length || 4;
+                  const moduloConcluido = totalEtapas > 0 && etapasConcluidas === totalEtapas;
+                  const progressoEtapas = Math.round((etapasConcluidas / totalEtapas) * 100);
+
+                  return (
+                    <article
+                    className={`content-topic-card ${moduloConcluido ? 'content-topic-card-complete' : ''}`}
+                    key={conteudo.id}
+                  >
+                    <div className="topic-number">
+                      {String(conteudo.ordem).padStart(2, '0')}
                     </div>
 
-                    <p>{topic.description}</p>
+                    <div className="topic-main">
+                      <div className="topic-heading">
+                        <div>
+                          <span className="topic-tag">
+                            {conteudo.tema}
+                          </span>
 
-                    <button
-                      type="button"
-                      className="topic-link"
-                    >
-                      Explorar conteúdo
-                      <span>→</span>
-                    </button>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
+                          <h3>{conteudo.titulo}</h3>
+                        </div>
 
-        {/* POR ONDE COMEÇAR */}
-        <section className="start-section">
-          <div className="container">
-            <div className="start-box">
-              <div className="start-heading">
-                <span className="section-label">
-                  POR ONDE COMEÇAR?
-                </span>
+                        <span className="topic-level">
+                          {conteudo.etapas?.length || 4} etapas
+                        </span>
+                      </div>
 
-                <h2>
-                  Nunca estudou sobre
-                  <br />
-                  segurança digital?
-                </h2>
+                      <p>{conteudo.corpo}</p>
 
-                <p>
-                  Não tem problema. Recomendamos começar pelos
-                  conceitos básicos e avançar aos poucos.
-                </p>
+                      <div className="topic-progress">
+                        <div className="topic-progress-header">
+                          <span className="topic-progress-count">
+                            {etapasConcluidas} de {totalEtapas} etapas
+                          </span>
+
+                          <span className="topic-progress-percent">
+                            {progressoEtapas}%
+                          </span>
+                        </div>
+
+                        <div className="topic-progress-bar">
+                          <span
+                            style={{
+                              width: `${progressoEtapas}%`,
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        className="topic-link"
+                        onClick={() =>
+                          navigate(`/conteudos/${conteudo.id}`)
+                        }
+                      >
+                        {moduloConcluido
+                          ? 'Revisar conteúdo'
+                          : 'Explorar conteúdo'}
+
+                        <span>→</span>
+                      </button>
+                    </div>
+                  </article>
+                  );
+                })}
               </div>
-
-              <div className="recommended-topics">
-                <div className="recommended-item">
-                  <span>01</span>
-
-                  <div>
-                    <strong>Phishing</strong>
-                    <p>
-                      Aprenda a reconhecer tentativas de fraude.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="recommended-item">
-                  <span>02</span>
-
-                  <div>
-                    <strong>Senhas seguras</strong>
-                    <p>
-                      Proteja suas contas com boas práticas.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="recommended-item">
-                  <span>03</span>
-
-                  <div>
-                    <strong>Golpes virtuais</strong>
-                    <p>
-                      Conheça golpes comuns na internet.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
         </section>
 
@@ -333,8 +317,8 @@ function Conteudos() {
               </h2>
 
               <p>
-                O Web Guarda apresenta os conteúdos de forma
-                progressiva para facilitar a compreensão.
+                Os módulos são independentes e cada um apresenta
+                seu conteúdo em quatro etapas sequenciais.
               </p>
             </div>
 
@@ -343,11 +327,11 @@ function Conteudos() {
                 <span className="step-number">01</span>
 
                 <div>
-                  <h3>Conheça</h3>
+                  <h3>Escolha</h3>
 
                   <p>
-                    Entenda o que são as principais ameaças
-                    presentes no ambiente digital.
+                    Escolha qualquer um dos módulos disponíveis
+                    para começar.
                   </p>
                 </div>
               </div>
@@ -356,11 +340,11 @@ function Conteudos() {
                 <span className="step-number">02</span>
 
                 <div>
-                  <h3>Identifique</h3>
+                  <h3>Avance</h3>
 
                   <p>
-                    Aprenda a reconhecer sinais que podem indicar
-                    uma tentativa de golpe ou fraude.
+                    Conclua as quatro etapas do módulo em
+                    sequência.
                   </p>
                 </div>
               </div>
@@ -369,11 +353,11 @@ function Conteudos() {
                 <span className="step-number">03</span>
 
                 <div>
-                  <h3>Proteja-se</h3>
+                  <h3>Conclua</h3>
 
                   <p>
-                    Coloque em prática hábitos que tornam sua
-                    experiência digital mais segura.
+                    Ao finalizar as quatro etapas, o módulo será
+                    marcado como concluído.
                   </p>
                 </div>
               </div>
@@ -386,25 +370,41 @@ function Conteudos() {
           <div className="container">
             <div className="contents-cta-box">
               <div>
-                <span className="section-label">
-                  TESTE SEUS CONHECIMENTOS
-                </span>
+                <span className="section-label">AVALIAÇÃO FINAL</span>
 
-                <h2>
-                  Já conhece os conceitos?
-                  <br />
-                  Faça sua avaliação.
-                </h2>
+                <h2>{avaliacaoConcluida ? 'Avaliação final concluída' : 'Avaliação final'}</h2>
 
                 <p>
-                  Responda algumas perguntas e descubra como está
-                  seu conhecimento sobre segurança digital.
+                  {avaliacaoConcluida
+                    ? 'Você já realizou esta avaliação.'
+                    : avaliacaoLiberada
+                      ? 'Você já concluiu os módulos necessários.'
+                      : 'Conclua pelo menos 3 dos 5 módulos para liberar a avaliação final.'}
+                </p>
+                {avaliacaoConcluida && avaliacaoFinal.resultado && (
+                  <p className="contents-final-progress">
+                    Pontuação: {Math.round(avaliacaoFinal.resultado.pontuacaoPercentual)}%
+                  </p>
+                )}
+                <p className="contents-final-progress">
+                  {modulosConcluidos} de {totalModulos} módulos concluídos
                 </p>
               </div>
 
-              <Button onClick={() => navigate('/avaliacao-final')}>
-                Fazer avaliação final
-              </Button>
+              <button
+                type="button"
+                className="contents-final-button"
+                disabled={!avaliacaoLiberada || avaliacaoFinal === null && carregando}
+                onClick={() => navigate(avaliacaoConcluida ? '/resultado' : '/avaliacao', {
+                  state: avaliacaoConcluida ? { phase: 'final' } : undefined,
+                })}
+              >
+                {avaliacaoConcluida
+                  ? 'Ver resultado'
+                  : avaliacaoLiberada
+                    ? 'Fazer avaliação final'
+                    : 'Avaliação bloqueada'}
+              </button>
             </div>
           </div>
         </section>

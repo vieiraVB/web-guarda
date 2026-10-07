@@ -21,8 +21,6 @@ function ContentsNavbar() {
           className="contents-navbar-logo"
         >
           <Logo />
-
-          <span>Web Guarda</span>
         </Link>
 
         <div className="contents-navbar-section">

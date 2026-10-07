@@ -5,6 +5,7 @@ import '../styles/pages/feedback.css'
 
 import EvaluationHeader from '../components/EvaluationHeader'
 import Button from '../components/Button'
+import Footer from '../components/Footer'
 
 const FEEDBACK_LIMIT = 1000
 
@@ -96,6 +97,7 @@ function Feedback() {
           )}
         </div>
       </main>
+      <Footer />
     </div>
   )
 }

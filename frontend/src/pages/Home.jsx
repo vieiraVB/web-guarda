@@ -210,7 +210,7 @@ function Home() {
                 sobre segurança digital.
               </p>
 
-              <Button onClick={() => navigate('/avaliacao-inicial')}>
+              <Button onClick={() => navigate('/avaliacao')}>
                 Fazer avaliação
               </Button>
             </div>

@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../generated/prisma"
 }
 
@@ -18,7 +18,7 @@ model Usuario {
 
   acessosConteudo AcessoConteudo[]
   tentativas      Tentativa[]
-  conclusoes      ConclusaoModulo[]
+  conclusoesEtapa ConclusaoEtapa[]
 }
 
 model Conteudo {
@@ -31,6 +31,7 @@ model Conteudo {
   criadoEm  DateTime @default(now())
 
   acessos AcessoConteudo[]
+  etapas  EtapaConteudo[]
 }
 
 model AcessoConteudo {
@@ -46,27 +47,46 @@ model AcessoConteudo {
   @@index([conteudoId])
 }
 
-model ConclusaoModulo {
-  id          BigInt   @id @default(autoincrement())
+model EtapaConteudo {
+  id         BigInt   @id @default(autoincrement())
+  conteudoId BigInt
+  titulo     String
+  corpo      String
+  ordem      Int
+  criadoEm   DateTime @default(now())
+
+  conteudo    Conteudo         @relation(fields: [conteudoId], references: [id], onDelete: Cascade)
+  conclusoes  ConclusaoEtapa[]
+
+  @@unique([conteudoId, ordem])
+  @@index([conteudoId])
+}
+
+model ConclusaoEtapa {
   usuarioId   BigInt
-  concluidoEm DateTime
+  etapaId     BigInt
+  concluidaEm DateTime @default(now())
 
-  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  etapa   EtapaConteudo @relation(fields: [etapaId], references: [id], onDelete: Cascade)
+  usuario Usuario       @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 
-  @@index([usuarioId])
+  @@id([usuarioId, etapaId])
+  @@index([etapaId])
 }
 
 model Questionario {
   id              BigInt  @id @default(autoincrement())
   grupoComparacao String
   fase            String
-  versao          String
+  versao          Int
   titulo          String
-  ativo           Boolean @default(true)
+  ativo           Boolean @default(false)
 
   questoes   QuestionarioQuestao[]
   tentativas Tentativa[]
   respostas  Resposta[]
+
+  @@unique([grupoComparacao, versao, fase])
 }
 
 model Questao {
@@ -90,6 +110,7 @@ model QuestionarioQuestao {
   questao      Questao      @relation(fields: [questaoId], references: [id], onDelete: Cascade)
 
   @@id([questionarioId, questaoId])
+  @@unique([questionarioId, ordem])
   @@index([questaoId])
 }
 
@@ -102,20 +123,25 @@ model Alternativa {
   questao   Questao    @relation(fields: [questaoId], references: [id], onDelete: Cascade)
   respostas Resposta[]
 
+  @@unique([questaoId, id])
   @@index([questaoId])
 }
 
 model Tentativa {
-  id                  BigInt   @id @default(autoincrement())
+  id                  BigInt    @id @default(autoincrement())
   usuarioId           BigInt
   questionarioId      BigInt
   status              String
   pontuacaoPercentual Decimal?
+  iniciadaEm          DateTime  @default(now())
+  concluidaEm         DateTime?
 
   usuario      Usuario      @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   questionario Questionario @relation(fields: [questionarioId], references: [id], onDelete: Cascade)
   respostas    Resposta[]
 
+  @@unique([usuarioId, questionarioId])
+  @@unique([id, questionarioId])
   @@index([usuarioId])
   @@index([questionarioId])
 }
@@ -127,15 +153,14 @@ model Resposta {
   questaoId      BigInt
   alternativaId  BigInt
 
-  tentativa    Tentativa    @relation(fields: [tentativaId], references: [id], onDelete: Cascade)
+  tentativa    Tentativa    @relation(fields: [tentativaId, questionarioId], references: [id, questionarioId], onDelete: Cascade)
   questionario Questionario @relation(fields: [questionarioId], references: [id], onDelete: Cascade)
   questao      Questao      @relation(fields: [questaoId], references: [id], onDelete: Cascade)
-  alternativa  Alternativa  @relation(fields: [alternativaId], references: [id], onDelete: Cascade)
+  alternativa  Alternativa  @relation(fields: [questaoId, alternativaId], references: [questaoId, id], onDelete: Cascade)
 
-  @@index([tentativaId])
-  @@index([questionarioId])
-  @@index([questaoId])
-  @@index([alternativaId])
+  @@unique([tentativaId, questaoId])
+  @@index([tentativaId, questionarioId])
+  @@index([questionarioId, questaoId])
 }
 
 model Feedback {

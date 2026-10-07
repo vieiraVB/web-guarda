@@ -11,7 +11,7 @@
 
 .hero-content {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
   align-items: center;
   gap: 60px;
   padding: 80px 0;
@@ -135,7 +135,7 @@
 .about-content {
   margin-top: 60px;
   display: grid;
-  grid-template-columns: 220px 1fr;
+  grid-template-columns: minmax(0, 220px) minmax(0, 1fr);
   align-items: center;
   gap: 50px;
   max-width: 900px;
@@ -186,7 +186,7 @@
 .topic-grid {
   margin-top: 55px;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 24px;
 }
 
@@ -202,7 +202,7 @@
 
 .evaluation-content {
   display: grid;
-  grid-template-columns: 1fr 360px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 360px);
   align-items: center;
   gap: 80px;
 }
@@ -270,7 +270,7 @@
 @media (max-width: 900px) {
   .hero-content,
   .evaluation-content {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .hero-illustration {
@@ -278,7 +278,7 @@
   }
 
   .topic-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .about-content {
@@ -293,12 +293,19 @@
 }
 
 @media (max-width: 600px) {
+  .hero-section {
+    min-height: 0;
+  }
+
   .hero-content {
-    padding: 60px 0;
+    gap: 24px;
+    padding: 44px 0 36px;
   }
 
   .hero-text h1 {
-    font-size: 42px;
+    font-size: clamp(34px, 10vw, 42px);
+    letter-spacing: -1.2px;
+    overflow-wrap: anywhere;
   }
 
   .hero-text p {
@@ -306,8 +313,8 @@
   }
 
   .hero-illustration {
-    transform: scale(0.85);
-    margin: -20px 0;
+    min-height: 280px;
+    margin: 0;
   }
 
   .topic-grid {
@@ -315,10 +322,56 @@
   }
 
   .evaluation-content h2 {
-    font-size: 32px;
+    font-size: clamp(28px, 8vw, 32px);
   }
 
   .about-content {
     margin-top: 40px;
+  }
+
+  .info-section,
+  .contents-section,
+  .evaluation-section {
+    padding: 64px 0;
+  }
+
+  .about-icon {
+    width: 150px;
+    height: 150px;
+  }
+
+  .about-icon img {
+    width: 120px;
+    height: 120px;
+  }
+
+  .evaluation-card {
+    width: 100%;
+  }
+}
+
+@media (max-width: 360px) {
+  .hero-badge {
+    max-width: 100%;
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  .security-card {
+    gap: 6px;
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+
+  .card-one {
+    right: 0;
+  }
+
+  .card-two {
+    left: 0;
+  }
+
+  .card-three {
+    right: 0;
   }
 }

@@ -19,6 +19,7 @@
   display: flex;         
   align-items: center;   
   gap: 12px;
+  min-width: 0;
 }
 
 .footer-logo-icon img {
@@ -50,12 +51,23 @@
   color: #b8c8d5;
 
   font-size: 14px;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 @media (max-width: 600px) {
   .footer-content {
     flex-direction: column;
 
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .footer-brand {
+    align-items: flex-start;
+  }
+
+  .footer-brand .footer-info {
     align-items: flex-start;
   }
 

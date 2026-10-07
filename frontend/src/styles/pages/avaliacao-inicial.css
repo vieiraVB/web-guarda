@@ -106,6 +106,46 @@
   opacity: 0.45;
 }
 
+.evaluation-state-page {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 24px;
+  background: var(--background);
+}
+
+.evaluation-state-card {
+  display: grid;
+  justify-items: start;
+  gap: 14px;
+  width: min(100%, 700px);
+  padding: clamp(24px, 5vw, 48px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.evaluation-state-card h1,
+.evaluation-state-card h2 {
+  color: var(--primary);
+}
+
+.evaluation-state-card p {
+  color: var(--text-secondary);
+}
+
+.evaluation-saved-score {
+  color: var(--primary) !important;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.evaluation-error {
+  margin-top: 16px;
+  color: var(--danger);
+}
+
 @media (max-width: 600px) {
   .avaliacao-main {
     padding: 50px 0 70px;
