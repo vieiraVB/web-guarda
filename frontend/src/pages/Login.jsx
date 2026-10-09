@@ -1,17 +1,18 @@
 import "../styles/pages/login.css";
 
+import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import webGuardaIcon from "../assets/web-guarda-icon.png";
-
-const API_URL = "http://localhost:3000/api";
+import { API_URL } from "../lib/api";
 
 function Login() {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [senhaVisivel, setSenhaVisivel] = useState(false);
   const [erro, setErro] = useState("");
   const [carregando, setCarregando] = useState(false);
 
@@ -114,15 +115,25 @@ function Login() {
                 <label htmlFor="senha">Senha</label>
               </div>
 
-              <input
-                type="password"
-                id="senha"
-                name="senha"
-                placeholder="Digite sua senha"
-                value={senha}
-                onChange={(event) => setSenha(event.target.value)}
-                required
-              />
+              <div className="password-input-wrapper">
+                <input
+                  type={senhaVisivel ? "text" : "password"}
+                  id="senha"
+                  name="senha"
+                  placeholder="Digite sua senha"
+                  value={senha}
+                  onChange={(event) => setSenha(event.target.value)}
+                  required
+                />
+                <button
+                  type="button"
+                  className="password-toggle"
+                  aria-label={senhaVisivel ? "Ocultar senha" : "Mostrar senha"}
+                  onClick={() => setSenhaVisivel(!senhaVisivel)}
+                >
+                  {senhaVisivel ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
 
             {erro && <p className="login-error">{erro}</p>}

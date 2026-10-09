@@ -1,13 +1,69 @@
 import '../styles/pages/cadastro.css'
 
+import { Eye, EyeOff } from 'lucide-react'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { API_URL } from '../lib/api'
 
 function Cadastro() {
   const navigate = useNavigate()
+  const [erro, setErro] = useState('')
+  const [sucesso, setSucesso] = useState('')
+  const [carregando, setCarregando] = useState(false)
+  const [senhaVisivel, setSenhaVisivel] = useState(false)
+  const [confirmacaoVisivel, setConfirmacaoVisivel] = useState(false)
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault()
-    navigate('/avaliacao-inicial')
+
+    const formData = new FormData(event.currentTarget)
+    const nome = String(formData.get('nome') || '').trim()
+    const email = String(formData.get('email') || '').trim()
+    const senha = String(formData.get('senha') || '')
+    const confirmarSenha = String(formData.get('confirmar-senha') || '')
+
+    setErro('')
+    setSucesso('')
+
+    if (!nome || !email || !senha || !confirmarSenha) {
+      setErro('Preencha todos os campos obrigatórios.')
+      return
+    }
+
+    if (senha.length < 6) {
+      setErro('A senha deve ter pelo menos 6 caracteres.')
+      return
+    }
+
+    if (senha !== confirmarSenha) {
+      setErro('A confirmação da senha não corresponde à senha informada.')
+      return
+    }
+
+    setCarregando(true)
+
+    try {
+      const response = await fetch(`${API_URL}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome, email, senha }),
+      })
+
+      const data = await response.json().catch(() => ({}))
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Não foi possível criar sua conta.')
+      }
+
+      setSucesso(data.message || 'Conta criada com sucesso. Redirecionando para o login...')
+      window.setTimeout(() => navigate('/login'), 1200)
+    } catch (error) {
+      setErro(error instanceof TypeError
+        ? 'Não foi possível conectar ao servidor. Verifique se a API está em execução e tente novamente.'
+        : error.message)
+    } finally {
+      setCarregando(false)
+    }
   }
 
   return (
@@ -88,6 +144,7 @@ function Cadastro() {
                   id="nome"
                   name="nome"
                   placeholder="Digite seu nome completo"
+                  required
                 />
               </div>
 
@@ -101,6 +158,7 @@ function Cadastro() {
                   id="email"
                   name="email"
                   placeholder="Digite seu e-mail"
+                  required
                 />
               </div>
 
@@ -109,12 +167,24 @@ function Cadastro() {
                   Senha
                 </label>
 
-                <input
-                  type="password"
-                  id="senha"
-                  name="senha"
-                  placeholder="Crie uma senha"
-                />
+                <div className="password-input-wrapper">
+                  <input
+                    type={senhaVisivel ? 'text' : 'password'}
+                    id="senha"
+                    name="senha"
+                    placeholder="Crie uma senha"
+                    required
+                    minLength={6}
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle"
+                    aria-label={senhaVisivel ? 'Ocultar senha' : 'Mostrar senha'}
+                    onClick={() => setSenhaVisivel(!senhaVisivel)}
+                  >
+                    {senhaVisivel ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
               </div>
 
               <div className="form-group">
@@ -122,28 +192,30 @@ function Cadastro() {
                   Confirmar senha
                 </label>
 
-                <input
-                  type="password"
-                  id="confirmar-senha"
-                  name="confirmar-senha"
-                  placeholder="Digite a senha novamente"
-                />
+                <div className="password-input-wrapper">
+                  <input
+                    type={confirmacaoVisivel ? 'text' : 'password'}
+                    id="confirmar-senha"
+                    name="confirmar-senha"
+                    placeholder="Digite a senha novamente"
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle"
+                    aria-label={confirmacaoVisivel ? 'Ocultar senha' : 'Mostrar senha'}
+                    onClick={() => setConfirmacaoVisivel(!confirmacaoVisivel)}
+                  >
+                    {confirmacaoVisivel ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
               </div>
 
-              <div className="form-checkbox">
-                <input
-                  type="checkbox"
-                  id="termos"
-                  name="termos"
-                />
+              {erro && <p role="alert">{erro}</p>}
+              {sucesso && <p role="status">{sucesso}</p>}
 
-                <label htmlFor="termos">
-                  Concordo com os termos de utilização da plataforma.
-                </label>
-              </div>
-
-              <button type="submit" className="Cadastro-button">
-                Criar minha conta
+              <button type="submit" className="Cadastro-button" disabled={carregando}>
+                {carregando ? 'Criando conta...' : 'Criar minha conta'}
               </button>
             </form>
 

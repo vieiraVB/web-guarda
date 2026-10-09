@@ -182,6 +182,35 @@
   box-shadow: 0 0 0 3px var(--accent-light);
 }
 
+.password-input-wrapper {
+  position: relative;
+}
+
+.password-input-wrapper input {
+  padding-right: 44px;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+
+.password-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
 .Cadastro-button {
   width: 100%;
 
@@ -213,34 +242,6 @@
   outline: 3px solid var(--accent-light);
 
   outline-offset: 2px;
-}
-
-/* CHECKBOX */
-
-.form-checkbox {
-  display: flex;
-  align-items: flex-start;
-  gap: 9px;
-
-  margin: 2px 0 4px;
-}
-
-.form-checkbox input {
-  width: 16px;
-  height: 16px;
-
-  margin-top: 3px;
-
-  accent-color: var(--accent);
-}
-
-.form-checkbox label {
-  color: var(--text-secondary);
-
-  font-size: 13px;
-  line-height: 1.5;
-
-  cursor: pointer;
 }
 
 /* LOGIN */
