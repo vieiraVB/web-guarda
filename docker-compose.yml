@@ -1,16 +1,35 @@
 services:
   postgres:
     image: postgres:16
-    container_name: web-guarda-postgres
     restart: unless-stopped
     environment:
       POSTGRES_DB: web_guarda
       POSTGRES_USER: web_guarda
-      POSTGRES_PASSWORD: web_guarda_dev
-    ports:
-      - "5432:5432"
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-web_guarda_dev}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U web_guarda -d web_guarda"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://web_guarda:${POSTGRES_PASSWORD:-web_guarda_dev}@postgres:5432/web_guarda?schema=public
+      JWT_SECRET: ${JWT_SECRET:-local-dev-secret-change-before-deploy}
+      PORT: 3000
+      NODE_ENV: production
+    command: ["sh", "-c", "npx prisma migrate deploy && npx prisma db seed && node src/app.js"]
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
 
 volumes:
   postgres_data:

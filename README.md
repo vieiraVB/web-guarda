@@ -278,6 +278,50 @@ No front-end, serão utilizados:
 
 Os testes serão executados durante o processo de integração contínua para auxiliar na identificação de falhas antes da integração das alterações ao projeto.
 
+## Execução local com Docker
+
+Requisitos: Docker Desktop com Docker Compose v2.
+
+Na raiz do repositório, execute:
+
+```bash
+docker compose up --build
+```
+
+A aplicação ficará disponível em `http://localhost:3000`. O Compose inicia o PostgreSQL, aguarda a verificação de saúde do banco, aplica as migrations, popula os conteúdos e questionários de demonstração e serve o frontend e a API pelo mesmo endereço. Os dados do banco permanecem no volume `postgres_data` mesmo após parar os containers.
+
+Para encerrar, use `Ctrl+C` e depois `docker compose down`. Para apagar também os dados locais, execute `docker compose down --volumes`.
+
+No ambiente local, a senha do banco e o segredo JWT possuem valores de desenvolvimento. Para alterá-los, defina `POSTGRES_PASSWORD` e `JWT_SECRET` no ambiente antes de iniciar o Compose. Não use esses valores locais em produção e não envie arquivos `.env` ou credenciais ao GitHub.
+
+## Testes e qualidade
+
+Os testes HTTP do backend usam Jest e Supertest. Eles exercitam a raiz da API, a rota de saúde e a resposta para rotas inexistentes, sem exigir um banco ativo:
+
+```bash
+npm --prefix backend ci
+npm --prefix backend test
+```
+
+O comando de teste gera o Prisma Client e executa a suíte em sequência. A análise estática do frontend pode ser executada com:
+
+```bash
+npm --prefix frontend ci
+npm --prefix frontend run lint
+```
+
+## Azure Pipelines
+
+O arquivo `azure-pipelines.yml` é acionado em atualizações e pull requests para `main`. As etapas Test e Quality executam os testes do backend e o ESLint do frontend; a etapa Build constrói a imagem Docker. A etapa Publish só é executada quando a variável `ACR_SERVICE_CONNECTION` aponta para uma Service Connection Docker válida.
+
+Para habilitar publicação e implantação, configure as variáveis do pipeline `ACR_SERVICE_CONNECTION`, `ACR_LOGIN_SERVER`, `AZURE_SERVICE_CONNECTION`, `AZURE_RESOURCE_GROUP`, `CONTAINER_APP_NAME` e `DEPLOY_ENABLED`. Defina `DEPLOY_ENABLED` como `true` para atualizar um Azure Container App já criado. Configure no Container App a porta de entrada `3000`, ingress externo, permissão de pull do ACR e as variáveis secretas `DATABASE_URL` e `JWT_SECRET`. O banco de produção deve ser provisionado separadamente e acessível pela aplicação.
+
+A conexão do repositório GitHub ao Azure DevOps, criação do ACR e do Container App, permissões e secrets exigem acesso à conta Azure/DevOps. Sem essas configurações, o pipeline ainda executa Test, Quality e Build, enquanto Publish e Deploy permanecem ignoradas; nenhuma publicação ou URL pública é presumida como pronta.
+
+## Evidências
+
+Registre evidências reais da execução do pipeline, dos testes aprovados, da imagem publicada no ACR e da aplicação implantada. Não inclua credenciais, tokens ou valores de secrets nas capturas.
+
 ## Integração contínua
 
 O projeto utilizará GitHub Actions para automatizar o processo de integração contínua (CI).
