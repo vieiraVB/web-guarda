@@ -15,7 +15,7 @@ describe("API Web Guarda", () => {
   test("responde à rota de saúde", async () => {
     const response = await request(app).get("/api/health");
 
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(201); // falha proposital;
     expect(response.body.status).toBe("ok");
   });
 
