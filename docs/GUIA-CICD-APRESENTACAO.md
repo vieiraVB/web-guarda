@@ -147,12 +147,13 @@ Faça esta etapa depois de existir uma imagem publicada no Docker Hub.
    | `JWT_SECRET` | Segredo aleatório longo exclusivo dessa aplicação. |
    | `NODE_ENV` | `production` |
    | `PORT` | `3000` |
+   | `SEED_DEMO` | `true` apenas para carregar os dados neste banco de demonstração. |
 
 6. Em **Advanced**, configure o health check como `/api/health`.
 7. Para esse banco novo de demonstração, defina **Docker Command** como:
 
    ```sh
-   sh -c 'npx prisma migrate deploy && npx prisma db seed && node src/app.js'
+   node scripts/start-container.cjs
    ```
 
    O comando padrão da imagem aplica migrations, mas não carrega os

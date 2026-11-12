@@ -92,11 +92,12 @@ Siga os passos C e D do [guia de CI/CD](./GUIA-CICD-APRESENTACAO.md):
    com `docker.io/SEU_USUARIO/web-guarda:latest`. A imagem deve existir primeiro.
 3. Configure no Render `DATABASE_URL` (conexão Neon), `JWT_SECRET` (segredo
    aleatório próprio), `NODE_ENV=production` e `PORT=3000`.
-4. Configure o health check `/api/health` e, para esse banco de demonstração,
+4. Configure `SEED_DEMO=true` apenas para esse banco de demonstração.
+   Configure o health check `/api/health` e
    o Docker Command:
 
    ```sh
-   sh -c 'npx prisma migrate deploy && npx prisma db seed && node src/app.js'
+   node scripts/start-container.cjs
    ```
 
 5. Aguarde o primeiro deploy. Abra a URL pública e crie sua conta pela interface.

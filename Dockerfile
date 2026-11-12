@@ -23,4 +23,4 @@ RUN DATABASE_URL=postgresql://build:build@localhost:5432/build?schema=public npx
 COPY --from=frontend-build /app/frontend/dist ./public
 
 EXPOSE 3000
-CMD ["sh", "-c", "npx prisma migrate deploy && node src/app.js"]
+CMD ["node", "scripts/start-container.cjs"]
