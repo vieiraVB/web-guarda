@@ -1,4 +1,5 @@
 trigger:
+  batch: true
   branches:
     include:
       - main
@@ -13,6 +14,8 @@ pool:
 
 variables:
   containerRepository: web-guarda
+  # PUBLISH_ENABLED e DEPLOY_ENABLED são configuradas na interface do Azure.
+  # Ausentes ou diferentes de 'true': executa CI sem publicar/implantar.
 
 stages:
   - stage: Test
@@ -31,6 +34,8 @@ stages:
           - script: npm test
             workingDirectory: backend
             displayName: Run API tests
+          - script: node --test scripts/deploy-render.test.cjs
+            displayName: Test deployment handling without cloud credentials
 
   - stage: Quality
     displayName: Quality
@@ -61,47 +66,69 @@ stages:
         steps:
           - script: docker build --tag $(containerRepository):$(Build.SourceVersion) .
             displayName: Build Docker image
+          - bash: |
+              set -euo pipefail
+              mkdir -p "$(Build.ArtifactStagingDirectory)/image"
+              docker save "$(containerRepository):$(Build.SourceVersion)" \
+                --output "$(Build.ArtifactStagingDirectory)/image/web-guarda.tar"
+            displayName: Export the approved image
+            condition: and(succeeded(), eq(variables['PUBLISH_ENABLED'], 'true'), eq(variables['Build.SourceBranch'], 'refs/heads/main'), ne(variables['Build.Reason'], 'PullRequest'))
+          - publish: $(Build.ArtifactStagingDirectory)/image
+            artifact: docker-image
+            displayName: Transfer image to the publication job
+            condition: and(succeeded(), eq(variables['PUBLISH_ENABLED'], 'true'), eq(variables['Build.SourceBranch'], 'refs/heads/main'), ne(variables['Build.Reason'], 'PullRequest'))
 
   - stage: Publish
     displayName: Publish
     dependsOn: Build
-    condition: and(succeeded(), ne(variables['ACR_SERVICE_CONNECTION'], ''))
+    condition: and(succeeded(), eq(variables['PUBLISH_ENABLED'], 'true'), eq(variables['Build.SourceBranch'], 'refs/heads/main'), ne(variables['Build.Reason'], 'PullRequest'))
     jobs:
       - job: PublishImage
-        displayName: Push image to Azure Container Registry
+        displayName: Push the approved image to Docker Hub
         steps:
-          - task: Docker@2
-            displayName: Build and push image
-            inputs:
-              command: buildAndPush
-              containerRegistry: $(ACR_SERVICE_CONNECTION)
-              repository: $(containerRepository)
-              Dockerfile: Dockerfile
-              buildContext: .
-              tags: |
-                $(Build.SourceVersion)
-                latest
+          - checkout: none
+          - download: current
+            artifact: docker-image
+          - bash: |
+              set -euo pipefail
+              if [[ ! "$DOCKERHUB_USERNAME" =~ ^[a-z0-9][a-z0-9_-]+$ ]] || \
+                 [[ -z "$DOCKERHUB_TOKEN" || "$DOCKERHUB_TOKEN" == '$('* ]]; then
+                echo "Configure DOCKERHUB_USERNAME e o secret DOCKERHUB_TOKEN."
+                exit 1
+              fi
+              printf '%s' "$DOCKERHUB_TOKEN" | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
+              trap 'docker logout >/dev/null 2>&1 || true' EXIT
+              docker load --input "$(Pipeline.Workspace)/docker-image/web-guarda.tar"
+              source_image="$(containerRepository):$(Build.SourceVersion)"
+              target_image="docker.io/$DOCKERHUB_USERNAME/$(containerRepository)"
+              docker tag "$source_image" "$target_image:$(Build.SourceVersion)"
+              docker tag "$source_image" "$target_image:latest"
+              docker push "$target_image:$(Build.SourceVersion)"
+              docker push "$target_image:latest"
+            displayName: Publish commit tag and latest without rebuilding
+            env:
+              DOCKERHUB_USERNAME: $(DOCKERHUB_USERNAME)
+              DOCKERHUB_TOKEN: $(DOCKERHUB_TOKEN)
 
   - stage: Deploy
     displayName: Deploy
     dependsOn: Publish
-    condition: and(succeeded(), eq(variables['DEPLOY_ENABLED'], 'true'), ne(variables['AZURE_SERVICE_CONNECTION'], ''), ne(variables['ACR_LOGIN_SERVER'], ''))
+    condition: and(succeeded(), eq(variables['PUBLISH_ENABLED'], 'true'), eq(variables['DEPLOY_ENABLED'], 'true'), eq(variables['Build.SourceBranch'], 'refs/heads/main'), ne(variables['Build.Reason'], 'PullRequest'))
     jobs:
-      - deployment: DeployContainerApp
-        displayName: Update Azure Container App
-        environment: web-guarda-production
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - task: AzureCLI@2
-                  displayName: Deploy published image
-                  inputs:
-                    azureSubscription: $(AZURE_SERVICE_CONNECTION)
-                    scriptType: bash
-                    scriptLocation: inlineScript
-                    inlineScript: |
-                      az containerapp update \
-                        --name "$(CONTAINER_APP_NAME)" \
-                        --resource-group "$(AZURE_RESOURCE_GROUP)" \
-                        --image "$(ACR_LOGIN_SERVER)/$(containerRepository):$(Build.SourceVersion)"
+      - job: DeployRender
+        displayName: Deploy the exact commit image to Render
+        timeoutInMinutes: 25
+        steps:
+          - task: NodeTool@0
+            inputs:
+              versionSpec: 22.x
+            displayName: Use Node.js 22
+          - script: node scripts/deploy-render.cjs
+            displayName: Wait for deployment and check the public application
+            env:
+              RENDER_API_KEY: $(RENDER_API_KEY)
+              RENDER_SERVICE_ID: $(RENDER_SERVICE_ID)
+              PUBLIC_APP_URL: $(PUBLIC_APP_URL)
+              DOCKERHUB_USERNAME: $(DOCKERHUB_USERNAME)
+              CONTAINER_REPOSITORY: $(containerRepository)
+              IMAGE_TAG: $(Build.SourceVersion)

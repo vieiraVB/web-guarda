@@ -19,8 +19,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends openssl && rm -
 COPY backend/package*.json ./
 RUN npm ci --omit=dev
 COPY backend/ ./
-ENV DATABASE_URL=postgresql://build:build@localhost:5432/build?schema=public
-RUN npx prisma generate
+RUN DATABASE_URL=postgresql://build:build@localhost:5432/build?schema=public npx prisma generate
 COPY --from=frontend-build /app/frontend/dist ./public
 
 EXPOSE 3000

@@ -1,0 +1,103 @@
+name: Plano B - CI e CD completo
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fallback-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  tests:
+    name: Testes da API e do controle de deploy
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+        working-directory: backend
+      - run: npm test
+        working-directory: backend
+      - run: node --test scripts/deploy-render.test.cjs
+
+  quality:
+    name: Qualidade do frontend
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+        working-directory: frontend
+      - run: npm run lint
+        working-directory: frontend
+
+  docker:
+    name: Build Docker e publicacao opcional
+    needs: [tests, quality]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      IMAGE_TAG: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Construir frontend e API na imagem Docker
+        run: |
+          docker build --label "org.opencontainers.image.revision=$IMAGE_TAG" \
+            --tag "web-guarda:$IMAGE_TAG" .
+      - name: Publicar a mesma imagem no Docker Hub
+        if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && vars.FALLBACK_PUBLISH_ENABLED == 'true' }}
+        shell: bash
+        env:
+          DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$DOCKERHUB_USERNAME" =~ ^[a-z0-9][a-z0-9_-]+$ ]] || [[ -z "$DOCKERHUB_TOKEN" ]]; then
+            echo "Configure a variable DOCKERHUB_USERNAME e o secret DOCKERHUB_TOKEN."
+            exit 1
+          fi
+          printf '%s' "$DOCKERHUB_TOKEN" | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
+          trap 'docker logout >/dev/null 2>&1 || true' EXIT
+          target_image="docker.io/$DOCKERHUB_USERNAME/web-guarda"
+          docker tag "web-guarda:$IMAGE_TAG" "$target_image:$IMAGE_TAG"
+          docker tag "web-guarda:$IMAGE_TAG" "$target_image:latest"
+          docker push "$target_image:$IMAGE_TAG"
+          docker push "$target_image:latest"
+
+  deploy:
+    name: Deploy Render e verificacao da URL
+    needs: docker
+    if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && vars.FALLBACK_PUBLISH_ENABLED == 'true' && vars.FALLBACK_DEPLOY_ENABLED == 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Implantar o commit aprovado e aguardar o resultado
+        run: node scripts/deploy-render.cjs
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_SERVICE_ID: ${{ vars.RENDER_SERVICE_ID }}
+          PUBLIC_APP_URL: ${{ vars.PUBLIC_APP_URL }}
+          DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
+          CONTAINER_REPOSITORY: web-guarda
+          IMAGE_TAG: ${{ github.sha }}

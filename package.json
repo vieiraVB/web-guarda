@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "setup": "npm run setup:docker && npm run setup:backend",
-    "setup:docker": "docker compose up -d",
+    "setup": "npm run setup:docker",
+    "setup:docker": "docker compose up -d --build",
     "setup:backend": "npm --prefix backend install && npm --prefix backend run setup",
-    "dev": "npm --prefix backend run dev"
+    "dev": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev"
   },
   "dependencies": {
     "jsonwebtoken": "^9.0.3",

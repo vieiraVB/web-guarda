@@ -294,6 +294,29 @@ Para encerrar, use `Ctrl+C` e depois `docker compose down`. Para apagar também 
 
 No ambiente local, a senha do banco e o segredo JWT possuem valores de desenvolvimento. Para alterá-los, defina `POSTGRES_PASSWORD` e `JWT_SECRET` no ambiente antes de iniciar o Compose. Não use esses valores locais em produção e não envie arquivos `.env` ou credenciais ao GitHub.
 
+### Execução sem Docker
+
+Com Node.js 22.12+ e PostgreSQL disponíveis, crie um banco exclusivo para o
+projeto e configure `backend/.env` a partir de `backend/.env.example`, ajustando
+`DATABASE_URL` e `JWT_SECRET` ao seu ambiente. Depois execute:
+
+```bash
+npm --prefix backend ci
+npm --prefix frontend ci
+npm --prefix backend run setup
+cd backend
+npx prisma db seed
+cd ..
+```
+
+Em dois terminais na raiz, execute `npm run dev` e `npm run dev:frontend`.
+Abra `http://localhost:5173`; a API usa `http://localhost:3000/api`.
+Cadastre sua própria conta pela interface: os usuários de exemplo do seed
+possuem hashes fictícios e não têm uma senha válida para login.
+
+O comando `npm run setup` da raiz inicia a aplicação completa pelo Docker;
+`npm run setup:backend` configura apenas o backend para um banco já acessível.
+
 ## Testes e qualidade
 
 Os testes HTTP do backend usam Jest e Supertest. Eles exercitam a raiz da API, a rota de saúde e a resposta para rotas inexistentes, sem exigir um banco ativo:
@@ -312,15 +335,55 @@ npm --prefix frontend run lint
 
 ## Azure Pipelines
 
-O arquivo `azure-pipelines.yml` é acionado em atualizações e pull requests para `main`. As etapas Test e Quality executam os testes do backend e o ESLint do frontend; a etapa Build constrói a imagem Docker. A etapa Publish só é executada quando a variável `ACR_SERVICE_CONNECTION` aponta para uma Service Connection Docker válida.
+Se o acesso ao Azure não ficar disponível, há um [plano B com GitHub Actions](docs/PLANO-B-GITHUB-ACTIONS.md).
+Ele mantém o Azure preservado e executa CI sem credenciais, com publicação/deploy
+opcionais pelo Docker Hub e Render. A troca para a apresentação deve ser combinada
+com o professor. A preparação local não comprova uma implantação remota.
 
-Para habilitar publicação e implantação, configure as variáveis do pipeline `ACR_SERVICE_CONNECTION`, `ACR_LOGIN_SERVER`, `AZURE_SERVICE_CONNECTION`, `AZURE_RESOURCE_GROUP`, `CONTAINER_APP_NAME` e `DEPLOY_ENABLED`. Defina `DEPLOY_ENABLED` como `true` para atualizar um Azure Container App já criado. Configure no Container App a porta de entrada `3000`, ingress externo, permissão de pull do ACR e as variáveis secretas `DATABASE_URL` e `JWT_SECRET`. O banco de produção deve ser provisionado separadamente e acessível pela aplicação.
+O [guia de CI/CD](docs/GUIA-CICD-APRESENTACAO.md) explica a configuração das contas
+e o ensaio da apresentação. O pipeline em [azure-pipelines.yml](azure-pipelines.yml)
+executa testes do backend, testes do controle de deploy, lint do frontend e build
+Docker em pushes e pull requests para `main`.
 
-A conexão do repositório GitHub ao Azure DevOps, criação do ACR e do Container App, permissões e secrets exigem acesso à conta Azure/DevOps. Sem essas configurações, o pipeline ainda executa Test, Quality e Build, enquanto Publish e Deploy permanecem ignoradas; nenhuma publicação ou URL pública é presumida como pronta.
+Para começar, conecte o repositório ao Azure DevOps e selecione esse YAML.
+Sem variáveis de habilitação, somente Test, Quality e Build executam.
+Configure as variáveis pela interface do pipeline, em três passos:
+
+| Passo | Variáveis no Azure Pipelines |
+| --- | --- |
+| CI | Nenhuma credencial de hospedagem necessária. É preciso ter um agente disponível. |
+| Publicação | `PUBLISH_ENABLED=true`, `DOCKERHUB_USERNAME` e `DOCKERHUB_TOKEN` (secret). |
+| Deploy | Manter publicação habilitada e adicionar `DEPLOY_ENABLED=true`, `RENDER_API_KEY` (secret), `RENDER_SERVICE_ID` e `PUBLIC_APP_URL`. |
+
+Publish e Deploy executam somente em `main`, nunca em pull requests. A mesma
+imagem construída é transferida como artefato e publicada no Docker Hub com
+tags do commit e `latest`. O deploy no Render solicita a tag exata do commit,
+aguarda o estado `live` e verifica a API e a página pública. Não requer ACR,
+Service Connections Azure nem Container Apps. Não exponha secrets a builds de forks.
+
+O serviço Render deve existir previamente, com plano Free e origem **Existing
+Image** apontando para `docker.io/SEU_USUARIO/web-guarda:latest`. Configure nele
+`DATABASE_URL`, `JWT_SECRET`, `NODE_ENV=production`, `PORT=3000` e health check
+`/api/health`. Para o banco exclusivo de demonstração, use o comando Docker
+`sh -c 'npx prisma migrate deploy && npx prisma db seed && node src/app.js'`.
+O PostgreSQL externo pode usar o plano Free do Neon; não use o banco local como
+endereço de produção. Confira limites dos planos antes de criar recursos.
+
+Testes locais do controle de deploy (sem acesso à nuvem):
+
+```bash
+node --test scripts/deploy-render.test.cjs
+```
+
+Configuração versionada e testes locais não comprovam execução remota. O fluxo
+completo exige configurar as contas, publicar o YAML no GitHub e conferir uma
+execução real, a imagem publicada e a aplicação na URL.
 
 ## Evidências
 
-Registre evidências reais da execução do pipeline, dos testes aprovados, da imagem publicada no ACR e da aplicação implantada. Não inclua credenciais, tokens ou valores de secrets nas capturas.
+Registre evidências reais da execução do Azure Pipelines, dos testes aprovados,
+da imagem publicada no Docker Hub e da aplicação implantada no Render. Não inclua
+credenciais, tokens ou valores de secrets nas capturas.
 
 ## Integração contínua
 
