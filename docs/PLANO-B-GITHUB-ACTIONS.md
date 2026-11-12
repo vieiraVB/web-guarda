@@ -1,5 +1,10 @@
 # Plano B: apresentação com GitHub Actions
 
+> Atualização em 12/11/2026: contas e credenciais foram configuradas e o
+> [fluxo completo passou](https://github.com/vieiraVB/web-guarda/actions/runs/43160977343).
+> Use o [guia essencial da apresentação](./GUIA-ESSENCIAL-APRESENTACAO.md) para o roteiro atual.
+> As seções abaixo preservam as instruções de configuração do plano B.
+
 Alternativa preparada em 12/11/2026 para o caso de o acesso ao Azure DevOps
 não ficar disponível a tempo. Combine a troca de plataforma com o professor.
 O [pipeline Azure](../azure-pipelines.yml) continua disponível.

@@ -1,5 +1,9 @@
 # Web Guarda: CI/CD para a apresentação
 
+> Estado atualizado em 12/11/2026: a alternativa GitHub Actions executou o fluxo completo com deploy.
+> Para apresentar agora, use o [guia essencial](./GUIA-ESSENCIAL-APRESENTACAO.md).
+> As instruções Azure abaixo descrevem a configuração preparada, sem execução Azure comprovada.
+
 Atualizado em 11/11/2026. O YAML e o controle de deploy foram adaptados para
 Docker Hub e Render. Contas, credenciais e execução remota ainda precisam ser
 configuradas; alterações locais não comprovam uma aplicação publicada.
@@ -156,8 +160,8 @@ Faça esta etapa depois de existir uma imagem publicada no Docker Hub.
    node scripts/start-container.cjs
    ```
 
-   O comando padrão da imagem aplica migrations, mas não carrega os
-   questionários. O comando acima também executa o seed necessário à demo.
+   O comando padrão da imagem usa o mesmo script. Ele aplica migrations e
+   carrega os questionários apenas quando `SEED_DEMO=true`.
    Use apenas o banco exclusivo de demonstração; não é um plano de migração
    para dados institucionais. O seed é reexecutado nas inicializações.
 

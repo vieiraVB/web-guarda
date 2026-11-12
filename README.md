@@ -1,5 +1,17 @@
 # Web Guarda
 
+## Apresentação de CI/CD
+
+- [Guia essencial: links, comandos e roteiro de 20 minutos](docs/GUIA-ESSENCIAL-APRESENTACAO.md)
+- [Slides para apresentar no navegador](docs/apresentacao/APRESENTACAO-WEB-GUARDA.html)
+- [Slides em PDF](docs/apresentacao/APRESENTACAO-WEB-GUARDA.pdf)
+- [Notas de fala por slide](docs/apresentacao/NOTAS-DE-FALA.md)
+
+Em 12/11/2026, o [pipeline completo no GitHub Actions](https://github.com/vieiraVB/web-guarda/actions/runs/43160977343)
+passou incluindo publicação Docker e deploy. A [aplicação está no Render](https://web-guarda-herickleal.onrender.com).
+A substituição do Azure Pipelines precisa ser combinada com o professor.
+O guia identifica o ensaio de falha/correção e as verificações que ainda faltam.
+
 **Curso:** Ciência da Computação
 
 **Período:** 8º período
