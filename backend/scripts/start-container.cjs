@@ -17,4 +17,8 @@ function prisma(...args) {
 
 prisma('migrate', 'deploy');
 if (process.env.SEED_DEMO === 'true') prisma('db', 'seed');
-require('../src/app.js');
+const app = require('../src/app.js');
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Web Guarda API rodando na porta ${port}`);
+});
